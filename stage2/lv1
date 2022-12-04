@@ -1,0 +1,49 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+var db *sql.DB
+
+func initDB() (err error) {
+	dsn := "root:960690@tcp(127.0.0.1:3306)/schoola?charset=utf8mb4&parseTime=True&loc=Local"
+	// 打开mysql驱动
+	db, err = sql.Open("mysql", dsn)
+	if err != nil {
+		return err
+	}
+
+	err2 := db.Ping()
+	if err2 != nil {
+		return err2
+	}
+	return nil
+}
+
+// 插入数据
+
+func insertData2(username string, password string) {
+	sqlStr := "insert into student(username,password) values (?,?)"
+	ret, err := db.Exec(sqlStr, username, password)
+	if err != nil {
+		fmt.Println("insert err = ", err)
+		return
+	}
+
+	theId, err := ret.LastInsertId() // 新插入的数据id
+	if err != nil {
+		fmt.Println("get LastInsertId err = ", err)
+		return
+	}
+	fmt.Printf("插入成功,id是: %d.\n", theId)
+}
+
+func main() {
+
+	initDB()
+	insertData2("jjj", "000")
+}
